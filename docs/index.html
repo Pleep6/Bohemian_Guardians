@@ -381,19 +381,11 @@ function buildSeriesSection(dir, games) {
       updateGlobalCount(dirs.length);
     })
     .catch(function(){
-      // 2. Fallback: JSON estático (GitHub Pages)
-      fetch('picks_bans_data.json')
+      // 2. Fallback: series_manifest.json (GitHub Pages)
+      fetch('series_manifest.json')
         .then(function(r){ return r.json(); })
         .then(function(d){
-          var dirs = [];
-          var seen = {};
-          (d.games || []).forEach(function(g){
-            var lbl = g._series_label || '';
-            if (lbl && lbl !== 'output' && !seen[lbl]) {
-              seen[lbl] = true;
-              dirs.push(lbl);
-            }
-          });
+          var dirs = d.series || [];
           dirs.forEach(function(dir){ buildSeriesSection(dir, []); });
           updateGlobalCount(dirs.length);
         })
