@@ -741,8 +741,19 @@ document.querySelectorAll('.nav-tab').forEach(t=>{
   if (!window.DATA) {
     try {
       const r = await fetch('./picks_bans_data.json');
-      if (r.ok) window.DATA = await r.json();
-    } catch(e) {}
+      if (r.ok) {
+        const apiData = await r.json();
+        apiData.games = deduplicateGames(apiData.games || []);
+        window.DATA = apiData;
+        const seriesCount = new Set(apiData.games.map(g=>
+          Object.values(g.team_names||{}).sort().join('|')
+        )).size;
+        document.getElementById('seasonInfo').textContent =
+          `${apiData.games.length} games · ${seriesCount} series`;
+        renderAll();
+        return;
+      }
+    } catch(e) { console.warn('JSON estático no disponible:', e); }
   }
 
   document.querySelector('.content').innerHTML = `
