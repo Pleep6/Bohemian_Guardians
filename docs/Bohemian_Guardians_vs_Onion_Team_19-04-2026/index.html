@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>LoL Scouting — War Room</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&family=Barlow+Condensed:wght@600;700;800&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#c89b3c;--gold2:#f0d07a;
+  --dark:#08090c;--panel:#0d1117;--panel2:#111820;--border:#1a2330;--text:#9ab0c0;--text2:#4a6070;
+  --blue:#4fc3f7;--green:#66bb6a;--orange:#ff9800;--purple:#ce93d8;--red:#ef5350;
+}
+html,body{height:100vh;width:100vw;overflow:hidden;background:var(--dark);color:var(--text);font-family:'Rajdhani',sans-serif;display:flex;flex-direction:column;}
+
+/* ── TOPBAR ── */
+#topbar{
+  flex-shrink:0;display:flex;align-items:center;justify-content:space-between;
+  padding:0 16px;height:40px;background:var(--panel);border-bottom:1px solid var(--border);
+}
+.tb-left{display:flex;align-items:center;gap:10px;}
+.tb-mark{font-family:'Barlow Condensed',sans-serif;font-size:.9rem;font-weight:800;letter-spacing:5px;text-transform:uppercase;color:var(--gold);}
+.tb-sep{width:1px;height:20px;background:var(--border);}
+.tb-sub{font-family:'Share Tech Mono',monospace;font-size:.56rem;color:var(--text2);letter-spacing:2px;}
+.tb-hint{font-family:'Share Tech Mono',monospace;font-size:.56rem;color:#2a3840;letter-spacing:1px;}
+
+/* ── GRID ── */
+#home{
+  flex:1;min-height:0;
+  display:grid;
+  grid-template-columns:1fr 1.7fr 1fr;
+  grid-template-rows:1fr 1fr;
+  gap:0;
+}
+
+/* ── CARDS ── */
+.card{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:10px;cursor:pointer;background:var(--dark);
+  transition:background .18s;position:relative;overflow:hidden;
+  border-right:1px solid var(--border);border-bottom:1px solid var(--border);
+  padding:18px 14px;
+}
+/* grid placement */
+.card.pb   {grid-column:1;grid-row:1;}
+.card.sj   {grid-column:3;grid-row:1;}
+.card.draft{grid-column:2;grid-row:1;}
+.card.sw   {grid-column:1;grid-row:2;}
+.card.ws   {grid-column:2;grid-row:2;}
+.card.ja   {grid-column:3;grid-row:2;}
+.card.tl-empty{grid-column:1;grid-row:1;}
+.card.gr   {grid-column:1;grid-row:2;}
+
+/* no right border on last col */
+.card.sj,.card.ja{border-right:none;}
+/* no bottom border on last row */
+.card.gr,.card.ws,.card.ja{border-bottom:none;}
+/* draft: no bottom */
+.card.draft{border-bottom:none;}
+
+/* top accent line */
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;transition:height .18s;}
+.card.pb::before   {background:var(--gold);}
+.card.sj::before   {background:var(--orange);}
+.card.draft::before{background:linear-gradient(90deg,var(--gold),var(--gold2),var(--gold));}
+.card.sw::before   {background:var(--green);}
+.card.ws::before   {background:var(--purple);}
+.card.ja::before   {background:var(--blue);}
+.card.tl-empty::before{background:var(--border);}
+.card.gr::before   {background:var(--red);}
+.card:hover::before{height:3px;}
+.card:hover{background:#0b0f16;}
+
+/* grid texture */
+.card::after{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(255,255,255,.009) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.009) 1px,transparent 1px);
+  background-size:28px 28px;
+}
+
+/* ── CARD CONTENT ── */
+.card-tag{
+  font-family:'Share Tech Mono',monospace;font-size:.48rem;
+  letter-spacing:3px;text-transform:uppercase;color:#2a3840;
+  border:1px solid #181f28;padding:2px 7px;border-radius:1px;
+  position:relative;z-index:1;
+}
+.card-icon{font-size:2.4rem;line-height:1;position:relative;z-index:1;}
+.card-title{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:1.1rem;font-weight:800;letter-spacing:4px;
+  text-transform:uppercase;text-align:center;
+  position:relative;z-index:1;
+}
+.card.pb    .card-title{color:var(--gold);}
+.card.sj    .card-title{color:var(--orange);}
+.card.draft .card-title{color:var(--gold2);}
+.card.sw    .card-title{color:var(--green);}
+.card.ws    .card-title{color:var(--purple);}
+.card.ja    .card-title{color:var(--blue);}
+.card.tl-empty .card-title{color:var(--text2);}
+.card.gr    .card-title{color:var(--red);}
+
+.card.tl-empty{cursor:default;}
+.card.tl-empty:hover{background:var(--dark);}
+.card.tl-empty:hover::before{height:2px!important;}
+
+.card-sub{
+  font-family:'Share Tech Mono',monospace;font-size:.58rem;
+  color:#3a5060;letter-spacing:.5px;text-align:center;line-height:1.8;
+  position:relative;z-index:1;
+}
+
+.card-badges{
+  display:flex;gap:4px;flex-wrap:wrap;justify-content:center;
+  position:relative;z-index:1;
+}
+.badge{
+  font-size:.48rem;padding:2px 7px;border-radius:2px;
+  font-family:'Share Tech Mono',monospace;letter-spacing:1px;border:1px solid;
+}
+.badge.gold  {color:var(--gold);  border-color:rgba(200,155,60,.4); background:rgba(200,155,60,.05);}
+.badge.blue  {color:var(--blue);  border-color:rgba(79,195,247,.4); background:rgba(79,195,247,.05);}
+.badge.green {color:var(--green); border-color:rgba(102,187,106,.4);background:rgba(102,187,106,.05);}
+.badge.orange{color:var(--orange);border-color:rgba(255,152,0,.4);  background:rgba(255,152,0,.05);}
+.badge.purple{color:var(--purple);border-color:rgba(206,147,216,.4);background:rgba(206,147,216,.05);}
+.badge.red   {color:var(--red);   border-color:rgba(239,83,80,.4);  background:rgba(239,83,80,.05);}
+
+/* status */
+.card-status{
+  font-family:'Share Tech Mono',monospace;font-size:.55rem;
+  letter-spacing:1px;padding:2px 8px;border-radius:2px;
+  position:relative;z-index:1;
+}
+.ok     {color:var(--green);}
+.missing{color:var(--red);}
+.pending{color:#2a3840;}
+
+/* draft glow on hover */
+.card.draft:hover{
+  background:#0d1117;
+  box-shadow:inset 0 0 60px rgba(200,155,60,.03);
+}
+
+/* ── VIEWER ── */
+#viewer{display:none;position:fixed;inset:0;z-index:100;flex-direction:column;}
+#vbar{
+  display:flex;align-items:center;gap:10px;padding:0 12px;
+  height:36px;flex-shrink:0;background:var(--panel);border-bottom:1px solid var(--border);
+}
+.back{
+  display:flex;align-items:center;gap:5px;padding:3px 10px;border-radius:3px;
+  cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text);
+  font-family:'Rajdhani',sans-serif;font-size:.75rem;font-weight:600;
+  letter-spacing:1px;text-transform:uppercase;transition:all .15s;user-select:none;
+}
+.back:hover{border-color:var(--gold);color:var(--gold);}
+#vtitle{font-size:.78rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold2);}
+.vsep{flex:1;}
+.vhint{font-family:'Share Tech Mono',monospace;font-size:.54rem;color:#2a3840;letter-spacing:1px;}
+#vframe{flex:1;border:none;width:100%;height:100%;}
+
+/* ── PDF FAB ── */
+#pdf-fab{
+  position:fixed;bottom:18px;right:18px;z-index:200;
+  display:flex;align-items:center;gap:7px;
+  padding:8px 16px 8px 12px;
+  background:var(--panel);border:1px solid rgba(200,155,60,.4);border-radius:6px;
+  cursor:pointer;
+  font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:2px;text-transform:uppercase;color:var(--gold);
+  box-shadow:0 4px 20px rgba(0,0,0,.6),0 0 12px rgba(200,155,60,.08);
+  transition:all .2s;user-select:none;
+}
+#pdf-fab:hover{
+  background:rgba(200,155,60,.08);border-color:var(--gold);
+  box-shadow:0 4px 24px rgba(0,0,0,.7),0 0 20px rgba(200,155,60,.2);
+  transform:translateY(-1px);
+}
+#pdf-fab:active{transform:translateY(0);}
+.fab-icon{font-size:.9rem;line-height:1;flex-shrink:0;}
+#pdf-fab.fab-loading{color:#2a3840;border-color:#1a2330;cursor:not-allowed;pointer-events:none;}
+#pdf-fab.fab-ok{color:var(--green);border-color:rgba(102,187,106,.5);}
+#pdf-fab.fab-err{color:var(--red);border-color:rgba(239,83,80,.4);}
+#pdf-fab.fab-loading .fab-icon{display:inline-block;animation:spin 1s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+#pdf-fab::after{
+  content:attr(data-tip);
+  position:absolute;bottom:calc(100% + 7px);right:0;
+  background:var(--panel);border:1px solid var(--border);
+  color:#4a6070;font-size:.53rem;letter-spacing:1px;
+  padding:3px 9px;border-radius:4px;white-space:nowrap;
+  pointer-events:none;opacity:0;transform:translateY(4px);transition:all .15s;
+}
+#pdf-fab:hover::after{opacity:1;transform:translateY(0);}
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <div class="tb-left">
+    <span style="font-size:1rem">⚔</span>
+    <span class="tb-mark">LOL SCOUTING</span>
+    <div class="tb-sep"></div>
+    <span class="tb-sub">WAR ROOM · GRID EVENTS ANALYZER</span>
+  </div>
+  <span class="tb-hint">ESC para volver · clic para abrir</span>
+</div>
+
+<!-- GAME REPORT MODAL -->
+<div id="gr-modal" style="display:none;position:fixed;inset:0;z-index:150;background:rgba(0,0,0,.75);align-items:center;justify-content:center;">
+  <div style="background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:24px 28px;min-width:260px;">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--red);margin-bottom:16px;">Game Report</div>
+    <div id="gr-buttons" style="display:flex;flex-direction:column;gap:8px;"></div>
+    <button onclick="document.getElementById('gr-modal').style.display='none'" style="margin-top:16px;width:100%;background:transparent;border:1px solid var(--border);color:var(--text2);font-family:'Rajdhani',sans-serif;font-size:.75rem;font-weight:600;letter-spacing:2px;text-transform:uppercase;padding:6px;border-radius:3px;cursor:pointer;">Cancelar</button>
+  </div>
+</div>
+
+<div id="home">
+
+<!-- TOP LEFT — Team Scoreboard -->
+  <div class="card pb" onclick="open_('team_scoreboard.html','🏆 Team Scoreboard')">
+    <div class="card-tag">ANÁLISIS DE TEMPORADA</div>
+    <div class="card-icon">🏆</div>
+    <div class="card-title">Team Scoreboard</div>
+    <div class="card-sub">KDA · CS · Gold · Campeones<br>First Blood · Towers · Dragons · Grubs<br>Stats por lado — Blue vs Red</div>
+    <div class="card-badges">
+      <span class="badge gold">KDA</span>
+      <span class="badge green">OBJETIVOS</span>
+      <span class="badge blue">BLUE/RED</span>
+      <span class="badge orange">TEMPORADA</span>
+    </div>
+    <div class="card-status pending" id="sSB">comprobando...</div>
+  </div>
+
+  <!-- CENTER — Draft Analysis (season) -->
+  <div class="card draft" onclick="open_('draft_analysis.html','📊 Draft Analysis')">
+    <div class="card-tag">ANÁLISIS DE TEMPORADA</div>
+    <div class="card-icon">📊</div>
+    <div class="card-title">Draft Analysis</div>
+    <div class="card-sub">
+      Pick &amp; ban rates · Presencia · Slots del draft<br>
+      Rol por turno (P1–P5 · B1–B5) · Blue vs Red side<br>
+      Versus matchups · Pool por jugador
+    </div>
+    <div class="card-badges">
+      <span class="badge gold">PICK RATE</span>
+      <span class="badge gold">BAN RATE</span>
+      <span class="badge gold">SLOTS P1–P5</span>
+      <span class="badge red">PRESENCIA</span>
+      <span class="badge blue">BLUE/RED</span>
+      <span class="badge purple">VERSUS</span>
+    </div>
+    <div class="card-status pending" id="sDraftA">comprobando...</div>
+  </div>
+
+  <!-- TOP RIGHT — Series Jungle Pathing -->
+  <div class="card sj" onclick="open_('series_jungle_pathing.html','🗺 Series Jungle Pathing')">
+    <div class="card-tag">SERIE COMPLETA</div>
+    <div class="card-icon">🗺</div>
+    <div class="card-title">Series Pathing</div>
+    <div class="card-sub">Rutas del jungla en mapa<br>Todos los games · Playback</div>
+    <div class="card-badges">
+      <span class="badge orange">MULTI-GAME</span>
+      <span class="badge orange">PLAYBACK ▶</span>
+    </div>
+    <div class="card-status pending" id="sSJ">comprobando...</div>
+  </div>
+
+  <!-- BOTTOM LEFT — Game Report -->
+  <div class="card gr" onclick="openGameReport()">
+    <div class="card-tag">POR PARTIDA</div>
+    <div class="card-icon">📄</div>
+    <div class="card-title">Game Report</div>
+    <div class="card-sub">Scoreboard · Lane diff @15<br>Item timeline · Kill feed · Objetivos</div>
+    <div class="card-badges">
+      <span class="badge red">GOLD DIFF</span>
+      <span class="badge red">CS DIFF</span>
+      <span class="badge gold">ITEMS</span>
+    </div>
+    <div class="card-status pending" id="sGR">comprobando...</div>
+  </div>
+
+  <!-- BOTTOM RIGHT — Jungle Analysis (season) -->
+  <div class="card ja" onclick="open_('jungle_analysis.html','🌲 Jungle Analysis')">
+    <div class="card-tag">ANÁLISIS DE TEMPORADA</div>
+    <div class="card-icon">🌲</div>
+    <div class="card-title">Jungle Analysis</div>
+    <div class="card-sub">First clear · Rutas frecuentes<br>Primer gank · Objetivos · Blue vs Red</div>
+    <div class="card-badges">
+      <span class="badge blue">FIRST CLEAR</span>
+      <span class="badge blue">RUTAS</span>
+      <span class="badge blue">SEASON</span>
+    </div>
+    <div class="card-status pending" id="sJA">comprobando...</div>
+  </div>
+
+  <!-- BOTTOM CENTER — Season Support Wards -->
+  <div class="card ws" onclick="open_('series_support_wards_season.html','🗺 Season Support Wards')">
+    <div class="card-tag">ANÁLISIS DE TEMPORADA</div>
+    <div class="card-icon">🗺</div>
+    <div class="card-title">Season Wards</div>
+    <div class="card-sub">Wards del support · Toda la temporada<br>Heatmap acumulado · Blue vs Red · Fase</div>
+    <div class="card-badges">
+      <span class="badge purple">HEATMAP SEASON</span>
+      <span class="badge purple">BLUE/RED</span>
+      <span class="badge purple">MULTI-SERIE</span>
+    </div>
+    <div class="card-status pending" id="sWS">comprobando...</div>
+  </div>
+
+</div>
+
+<!-- VIEWER -->
+<div id="viewer">
+  <div id="vbar">
+    <button class="back" onclick="closeV()">← Volver</button>
+    <span id="vtitle"></span>
+    <span class="vsep"></span>
+    <span class="vhint">ESC para cerrar</span>
+  </div>
+  <iframe id="vframe" src="" title="Viewer"></iframe>
+</div>
+
+<!-- PDF FAB -->
+<div id="pdf-fab" data-tip="Genera scouting_report.pdf en output/" onclick="generatePdf()">
+  <span class="fab-icon" id="fab-icon">📄</span>
+  <span id="fab-label">Scouting PDF</span>
+</div>
+
+<script>
+// ── FILE CHECKS ───────────────────────────────────────────────────────────────
+var CHECKS = [
+  {url:'team_scoreboard.html', id:'sSB'},
+  {url:'draft_analysis.html',              id:'sDraftA'},
+  {url:'series_jungle_pathing.html',       id:'sSJ'},
+  {url:'jungle_analysis.html',             id:'sJA'},
+  {url:'series_support_wards_season.html', id:'sWS'},
+];
+CHECKS.forEach(function(c){
+  fetch(c.url,{method:'HEAD'}).then(function(r){
+    var el=document.getElementById(c.id);
+    if(!el) return;
+    el.textContent=r.ok?'✓ listo':'✗ sin datos';
+    el.className='card-status '+(r.ok?'ok':'missing');
+  }).catch(function(){
+    var el=document.getElementById(c.id);
+    if(!el) return;
+    el.textContent='✗ sin datos';
+    el.className='card-status missing';
+  });
+});
+
+// Game report: detectar qué games existen
+var _grFound=[];
+(function(){
+  var checks=[];
+  for(var g=1;g<=5;g++){
+    (function(gn){
+      checks.push(
+        fetch('game_report_G'+gn+'.html',{method:'HEAD'})
+          .then(function(r){if(r.ok) _grFound.push(gn);})
+          .catch(function(){})
+      );
+    })(g);
+  }
+  Promise.all(checks).then(function(){
+    _grFound.sort(function(a,b){return a-b;});
+    var el=document.getElementById('sGR');
+    if(_grFound.length){
+      el.textContent='✓ '+_grFound.map(function(g){return'G'+g;}).join(' · ');
+      el.className='card-status ok';
+    } else {
+      el.textContent='✗ sin datos';
+      el.className='card-status missing';
+    }
+    var btns=document.getElementById('gr-buttons');
+    btns.innerHTML='';
+    _grFound.forEach(function(gn){
+      var b=document.createElement('button');
+      b.textContent='Game '+gn;
+      b.style.cssText='background:transparent;border:1px solid var(--border);color:var(--red);font-family:"Barlow Condensed",sans-serif;font-size:.9rem;font-weight:800;letter-spacing:3px;text-transform:uppercase;padding:8px 16px;border-radius:3px;cursor:pointer;transition:all .15s;';
+      b.onmouseover=function(){this.style.borderColor='var(--red)';this.style.background='rgba(239,83,80,.08)';};
+      b.onmouseout=function(){this.style.borderColor='var(--border)';this.style.background='transparent';};
+      b.onclick=(function(n){return function(){
+        document.getElementById('gr-modal').style.display='none';
+        open_('game_report_G'+n+'.html','📄 Game Report — G'+n);
+      };})(gn);
+      btns.appendChild(b);
+    });
+  });
+})();
+
+function openGameReport(){
+  if(!_grFound.length) return;
+  if(_grFound.length===1){
+    open_('game_report_G'+_grFound[0]+'.html','📄 Game Report — G'+_grFound[0]);
+    return;
+  }
+  document.getElementById('gr-modal').style.display='flex';
+}
+
+
+
+// ── VIEWER ────────────────────────────────────────────────────────────────────
+function open_(file,title){
+  var frame=document.getElementById('vframe');
+  frame.style.opacity='0';
+  frame.src='';
+  setTimeout(function(){ frame.src=file; }, 0);
+  frame.onload=function(){
+    frame.style.transition='opacity .25s ease';
+    frame.style.opacity='1';
+  };
+  document.getElementById('vtitle').textContent=title;
+  document.getElementById('viewer').style.display='flex';
+  document.getElementById('home').style.display='none';
+  document.getElementById('topbar').style.display='none';
+}
+function closeV(){
+  document.getElementById('viewer').style.display='none';
+  document.getElementById('home').style.display='grid';
+  document.getElementById('topbar').style.display='flex';
+}
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeV();});
+
+// ── PDF FAB ───────────────────────────────────────────────────────────────────
+var _busy=false;
+function generatePdf(){
+  if(_busy)return;
+  _busy=true;
+  var fab=document.getElementById('pdf-fab');
+  var icon=document.getElementById('fab-icon');
+  var lbl=document.getElementById('fab-label');
+  fab.className='fab-loading';
+  icon.textContent='⏳';lbl.textContent='Generando...';
+  fab.setAttribute('data-tip','Ejecutando generate_scouting_pdf.py...');
+  fetch('http://localhost:5000/generate_pdf')
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(d.ok){
+        fab.className='fab-ok';icon.textContent='✅';lbl.textContent='PDF listo';
+        fab.setAttribute('data-tip','Guardado en output/scouting_report.pdf');
+        setTimeout(resetFab,4000);
+      } else {
+        fab.className='fab-err';icon.textContent='❌';lbl.textContent='Error';
+        fab.setAttribute('data-tip',d.error||'Revisa la consola');
+        setTimeout(resetFab,5000);
+      }
+    })
+    .catch(function(){
+      fab.className='fab-err';icon.textContent='❌';lbl.textContent='Sin conexión';
+      fab.setAttribute('data-tip','No se pudo conectar con localhost:5000');
+      setTimeout(resetFab,5000);
+    });
+}
+function resetFab(){
+  _busy=false;
+  var fab=document.getElementById('pdf-fab');
+  fab.className='';
+  document.getElementById('fab-icon').textContent='📄';
+  document.getElementById('fab-label').textContent='Scouting PDF';
+  fab.setAttribute('data-tip','Genera scouting_report.pdf en output/');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+**G1 — Pantheon**
+  Path 1: Raptors 01:10 → Blue 01:38
+  Path 2: Krugs 02:26 → Red 02:49 → Blue 03:32 → Gromp 03:49 → Wolves 04:03
+  Path 3: Raptors 04:40 → Krugs 05:01
+  Path 4: Gromp 06:31 → Wolves 06:47 → Crab 07:07 → Raptors 07:37 → Grub 08:32 → Grub 08:37 → Grub 08:41
+  Path 5: Krugs 09:17 → Red 09:35 → Crab 10:04 → Blue 10:49 → Gromp 11:03 → Wolves 11:16
+  Path 6: Raptors 11:50 → Krugs 12:14
+  Path 7: Gromp 13:38 → Wolves 13:48
+  Path 8: Red 15:18 → Krugs 15:19
+  Path 9 → (sin objetivos)
+**G2 — Zaahen**
+  Path 1: Raptors 01:12 → Krugs 01:27 → Red 01:58 → Wolves 02:23 → Red 03:01 → Raptors 03:39 → Krugs 04:02
+  Path 2: Gromp 05:02 → Wolves 05:20 → Raptors 06:13 → Krugs 06:29
+  Path 3: Blue 07:24 → Gromp 07:45 → Red 08:16 → Wolves 09:07 → Raptors 09:23
+  Path 4: Gromp 10:33 → Wolves 11:30 → Raptors 11:47 → Raptors 12:05
+  Path 5: Blue 12:53 → Gromp 13:05
+  Path 6: Raptors 14:26 → Crab 14:35 → Krugs 15:30 → Red 15:44 → Wolves 16:01 → Gromp 16:16 → Krugs 16:38
+  Path 7: Krugs 17:59
